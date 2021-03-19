@@ -1,2 +1,6 @@
 # Gideon
-A personal assistant
+An automated personal assistant
+
+## Requirements:
+
+## Suggestions:
