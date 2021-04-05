@@ -1,91 +1,79 @@
 #Pronunciation of User's name:
-import comtypes.client
-import time
-try:
-    import pyttsx3
-except:
-    time.sleep(0)
-try:
-    import gtts
-    from playsound import playsound
-except:
-    time.sleep(0)
 Username = 'Fyke'
+
 # modules:
+import comtypes.client, time, datetime, wikipedia, os, subprocess, speech_recognition as sr, webbrowser, wolframalpha, json, requests
 
-try:
-    import speech_recognition as sr
-except:
-    time.sleep(0)
-
-import datetime
-import wikipedia
-try:
-    import webbrowser
-    import wolframalpha
-except:
-    time.sleep(0)
-import os
-import subprocess
 try:
     from ecapture import ecapture as ec
 except:
     time.sleep(0)
+
+#text to speech engines: gtts (unofficial google text to speech engine using Google Translate's text-to-speech API (therefore needs an internet connection) ), pyttsx3 (tts library with multiple engines)
 try:
-    import json
+    import gtts
+    from playsound import playsound
 except:
-    time.sleep(0)
-import requests
-#-------------------------------------
-#Code for using pyttsx3
-engine=pyttsx3.init()
-voices=engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
-#-------------------------------------
-def speak(text):
-    #try:
-    tts = gtts.gTTS(text)
-    tts.save("speech.mp3")
-    playsound("speech.mp3")
-    #except:
-     #   engine.say(text)
-      #  engine.runAndWait()
-#-------------------------------------
-def wishMe():
-    hour=datetime.datetime.now().hour
-    if hour>=0 and hour<12:
-        speak('Hello, good morning '+ Username)
-        speak("How can I help you?")
-        print('Hello, good morning '+ Username)
-    elif hour>=12 and hour<18:
-        speak('Hello, good afternoon ' + Username)
-        speak("How can I help you?")
-        print('Hello, good afternoon ' + Username)
-    else:
-        speak('Hello, good evening ' + Username)
-        speak("How can I help you?")
-        print('Hello, good evening ' + Username)
-#-------------------------------------
-def takeCommand():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("Listening...")
-        audio=r.listen(source)
+    import pyttsx3
 
-        try:
-            statement=r.recognize_google(audio,language='en-in')
-            print("user said:{ ", str(statement), "}\n")
+#-----------------------------------------------------------------------------
 
-        except Exception as e:
-            print("Not catching anything")
-            return "None"
-        return statement
+def StartGideon():
+    #Code for using pyttsx3
+    engine=pyttsx3.init()
+    voices=engine.getProperty('voices')
+    engine.setProperty('voice', voices[0].id)
 
-print("Loading Gideon resources")
-speak("Loading Gideon's resources")
-wishMe()
-if __name__=='__main__':
+    #-------------------------------------
 
+    def speak(text):
+        #try:
+        tts = gtts.gTTS(text)
+        tts.save("speech.mp3")
+        playsound("speech.mp3")
+        #except:
+         #   engine.say(text)
+          #  engine.runAndWait()
+
+    #-------------------------------------
+
+    def wishMe():
+        hour=datetime.datetime.now().hour
+        if hour>=0 and hour<12:
+            speak('Hello, good morning '+ Username)
+            speak("How can I help you?")
+            print('Hello, good morning '+ Username)
+        elif hour>=12 and hour<18:
+            speak('Hello, good afternoon ' + Username)
+            speak("How can I help you?")
+            print('Hello, good afternoon ' + Username)
+        else:
+            speak('Hello, good evening ' + Username)
+            speak("How can I help you?")
+            print('Hello, good evening ' + Username)
+
+    #-------------------------------------
+
+    def takeCommand():
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("Listening...")
+            audio=r.listen(source)
+
+            try:
+                statement=r.recognize_google(audio,language='en-in')
+                print("user said:{ ", str(statement), "}\n")
+
+            except Exception as e:
+                print("Not catching anything")
+                return "None"
+            return statement
+
+    print("Loading Gideon resources")
+    speak("Loading Gideon's resources")
+    wishMe()
+
+    #---------------------------------------------------------
 
     while True:
         statement = takeCommand().lower()
@@ -134,7 +122,7 @@ if __name__=='__main__':
             directory = os.getcwd()
             f = open(directory + "Computer-Resources\PortableApps\Gideon\WolframAlphaID.txt", "r")
             app_id = f.read()
-#            client = wolframalpha.Client('R2K75H-7ELALHR35X')
+            #client = wolframalpha.Client('R2K75H-7ELALHR35X')
             res = client.query(question)
             answer = next(res.results).text
             speak(answer)
@@ -171,7 +159,63 @@ if __name__=='__main__':
                       "\n description = " +
                       str(weather_description))
         elif "log off" in statement or "sign out" in statement:
-            speak(
-                "Ok , your pc will log off in 10 sec. Make sure you exit from all applications")
+            speak("Ok , your pc will log off in 10 sec. Make sure you exit from all applications")
             subprocess.call(["shutdown", "/l"])
+        elif "restart" in statement or "reboot" in statement:
+            speak("Ok , your pc will reboot in 10 sec. Make sure you exit from all applications")
+            subprocess.call(["shutdown", "/r"])
+        elif "shutdown" in statement or "turn off" in statement or "power off" in statement:
+            speak("Ok , your pc will power off in 10 sec. Make sure you exit from all applications")
+            subprocess.call(["shutdown", "/s"])
         time.sleep(3)
+
+#---------------------------------------------------------
+
+TRAY_TOOLTIP = 'Gideon'
+TRAY_ICON = directory+'Computer-Resources\\PortableApps\\Gideon\\microphone.ico'
+
+def create_menu_item(menu, label, func):
+    item = wx.MenuItem(menu, -1, label)
+    menu.Bind(wx.EVT_MENU, func, id=item.GetId())
+    menu.Append(item)
+    return item
+
+class TrApp(wx.App):
+    def OnInit(self):
+        frame = wx.Frame(None)
+        self.SetTopWindow(frame)
+        TaskBarIcon(frame)
+        return True
+
+def main():
+    TrayApp = TrApp(False)
+    TrayApp.MainLoop()
+
+class TaskBarIcon(wx.adv.TaskBarIcon):
+    def __init__(self, frame):
+        self.frame = frame
+        super(TaskBarIcon, self).__init__()
+        self.set_icon(TRAY_ICON)
+        self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
+
+    def CreatePopupMenu(self):
+        menu = wx.Menu()
+        menu.AppendSeparator()
+        create_menu_item(menu, 'Exit', self.on_exit)
+        return menu
+
+    def set_icon(self, path):
+        icon = wx.Icon(path)
+        self.SetIcon(icon, TRAY_TOOLTIP)
+
+    def on_left_down(self, event):
+        app = StartGideon()
+        app.mainloop()
+
+    def on_exit(self, event):
+        sys.exit(0)
+
+#--------------------------------------running program---------------------------------------#
+
+if __name__ == "__main__":
+    main()
