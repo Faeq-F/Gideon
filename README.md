@@ -12,7 +12,7 @@ An automated personal assistant
  - Setting up a task to run Gideon at startup in Task Scheduler helps ease of use as you won't need to start the program manually
 
 ## Instructions for use:
-     Ensure you have saved your IDs and API keys in the 'IDs.txt' file
+   Ensure you have saved your IDs and API keys in the 'IDs.txt' file
 1. Launch the application
 2. Make Gideon listen to you by clicking on Gideon's icon in the system tray
 3. Say anything, if Gideon recognises what you say as a command, they will answer you. If not, Gideon will just wait until a command is given.
