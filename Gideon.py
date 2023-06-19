@@ -1,3 +1,5 @@
+#Please add your wolfram and weather api keys
+
 #Pronunciation of User's name:
 Username = 'Fyke'
 
@@ -122,7 +124,7 @@ def StartGideon():
             directory = os.getcwd()
             f = open(directory + "Computer-Resources\PortableApps\Gideon\WolframAlphaID.txt", "r")
             app_id = f.read()
-            #client = wolframalpha.Client('R2K75H-7ELALHR35X')
+            #client = wolframalpha.Client('')
             res = client.query(question)
             answer = next(res.results).text
             speak(answer)
@@ -133,7 +135,7 @@ def StartGideon():
             speak("I was built by " + Username)
             print("I was built by " + Username)
         elif "weather" in statement:
-            api_key = "a3c3e35850a8631a6a95a9418e1aa468"
+            api_key = ""
             base_url = "https://api.openweathermap.org/data/2.5/weather?"
             speak("what is the city name")
             city_name = takeCommand()
